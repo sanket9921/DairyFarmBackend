@@ -32,6 +32,11 @@ public class AnimalController {
     public List<Animal> getAllAnimals() {
         return animalService.getAllAnimals();
     }
+    
+    @GetMapping("/user/{userId}")
+    public List<Animal> getAnimalsByUserId(@PathVariable Long userId) {
+        return animalService.getAnimalsByUserId(userId);
+    }
 
     @GetMapping("/{id}")
     public Animal getAnimalById(@PathVariable Long id) {
@@ -48,12 +53,21 @@ public class AnimalController {
 
 
     @PutMapping("/{id}")
-    public Animal updateAnimal(@PathVariable Long id, @RequestBody Animal updatedAnimal) {
-        return animalService.updateAnimal(id, updatedAnimal);
+    public ResponseEntity<Animal> updateAnimal(
+            @PathVariable Long id,
+            @RequestPart("animal") Animal updatedAnimal, // Part to update animal details
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile // Part for the image file
+    ) {
+        try {
+            Animal updatedAnimalEntity = animalService.updateAnimal(id, updatedAnimal, imageFile);
+            return ResponseEntity.ok(updatedAnimalEntity);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(null); // Handle any exceptions (like Cloudinary errors)
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAnimal(@PathVariable Long id) {
+    public ResponseEntity<?> deleteAnimal(@PathVariable Long id) throws IOException {
         animalService.deleteAnimal(id);
         return ResponseEntity.ok().build();
     }

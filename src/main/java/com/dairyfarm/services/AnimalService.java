@@ -3,6 +3,7 @@ package com.dairyfarm.services;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,17 +54,72 @@ public class AnimalService {
         }
         return animalRepository.save(animal);
     }
-
-    public Animal updateAnimal(Long id, Animal updatedAnimal) {
+    
+    public List<Animal> getAnimalsByUserId(Long userId) {
+        return animalRepository.findByUserId(userId);
+    }
+    
+    public Animal updateAnimal(Long id, Animal updatedAnimal, MultipartFile newImageFile) throws IOException {
         Animal animal = getAnimalById(id);
+
+        // Update basic animal details
         animal.setBreed(updatedAnimal.getBreed());
         animal.setDateOfBirth(updatedAnimal.getDateOfBirth());
         animal.setGender(updatedAnimal.getGender());
         animal.setStatus(updatedAnimal.getStatus());
+
+        // Check if there's a new image file
+        if (newImageFile != null && !newImageFile.isEmpty()) {
+            // If the animal already has an image, delete the old one from Cloudinary
+            if (animal.getImageUrl() != null && !animal.getImageUrl().isEmpty()) {
+                // Extract the public ID of the old image from the URL to delete it
+                String publicId = getPublicIdFromUrl(animal.getImageUrl());
+                if (publicId != null) {
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                }
+            }
+
+            // Upload the new image to Cloudinary
+            Map uploadResult = cloudinary.uploader().upload(newImageFile.getBytes(), ObjectUtils.emptyMap());
+            String newImageUrl = (String) uploadResult.get("secure_url");
+
+            // Update the image URL in the animal entity
+            animal.setImageUrl(newImageUrl);
+        }
+
         return animalRepository.save(animal);
     }
+    public void deleteAnimal(Long id) throws IOException {
+        Optional<Animal> animalOpt = animalRepository.findById(id);
+        
+        if (animalOpt.isPresent()) {
+            Animal animal = animalOpt.get(); 
+            
+            // Delete image from Cloudinary
+            if (animal.getImageUrl() != null && !animal.getImageUrl().isEmpty()) {
+                // Extract the public ID from the Cloudinary image URL
+                String publicId = getPublicIdFromUrl(animal.getImageUrl());
+                if (publicId != null) {
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                }
+            }
 
-    public void deleteAnimal(Long id) {
-        animalRepository.deleteById(id);
+            // Delete animal from database
+            animalRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException("Animal not found");
+        }
+    }
+    
+ // Helper method to extract Cloudinary public ID from image URL
+    private String getPublicIdFromUrl(String imageUrl) {
+        // Assuming the Cloudinary URL has the format: 
+        // https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}.{format}
+        String[] urlParts = imageUrl.split("/");
+        if (urlParts.length > 0) {
+            String publicIdWithFormat = urlParts[urlParts.length - 1];
+            return publicIdWithFormat.split("\\.")[0];  // Remove the file extension
+        }
+        return null;
     }
 }
