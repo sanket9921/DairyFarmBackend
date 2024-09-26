@@ -3,6 +3,7 @@ package com.dairyfarm.controllers;
 import com.dairyfarm.models.MilkProduction;
 import com.dairyfarm.services.MilkProductionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class MilkProductionController {
     public ResponseEntity<MilkProduction> addMilkProductionForAnimal(
             @RequestParam Long animalId,
             @RequestParam BigDecimal totalQuantity,
-            @RequestParam Date productionDate,
+            @RequestParam  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date productionDate,
             @RequestParam(required = false) String notes) {
 
         MilkProduction milkProduction = milkProductionService.addMilkProductionForAnimal(animalId, totalQuantity, productionDate, notes);
@@ -49,7 +50,7 @@ public class MilkProductionController {
     @PostMapping("/farm")
     public ResponseEntity<MilkProduction> addMilkProductionForFarm(
             @RequestParam BigDecimal totalQuantity,
-            @RequestParam Date productionDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date productionDate,  // Ensure correct date format handling
             @RequestParam(required = false) String notes) {
 
         MilkProduction milkProduction = milkProductionService.addMilkProductionForFarm(totalQuantity, productionDate, notes);
