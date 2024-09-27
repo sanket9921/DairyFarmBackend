@@ -57,7 +57,10 @@ public class Animal {
     public Animal() {
     }
 
-    
+    public Animal(Long id) {
+        this.id = id;  // Only set the ID, without fetching the whole object
+    }
+
     public Animal(Long id, User user, String tagNumber, String breed, Date dateOfBirth, Gender gender, String imageUrl,
 			Status status, Timestamp createdAt, Timestamp updatedAt) {
 		super();

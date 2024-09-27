@@ -1,178 +1,187 @@
 package com.dairyfarm.models;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
 
 @Entity
-@Table(name = "breeding_records")
 public class BreedingRecord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long breedingId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "female_animal_id", nullable = false)
-    private Animal femaleAnimal;
-
-    @ManyToOne
-    @JoinColumn(name = "male_animal_id", nullable = false)
-    private Animal maleAnimal;
+    @JoinColumn(name = "animal_id", nullable = false)
+    private Animal animal;  // Link to Animal entity
 
     @Column(nullable = false)
-    private Date matingDate;
+    private LocalDate matingDate;  // Date of mating
 
-    private Date pregnancyCheckDate;
+    @ManyToOne
+    @JoinColumn(name = "sire_id", nullable = true)
+    private Animal sire;  // If AI, this can be null
 
-    @Enumerated(EnumType.STRING)
-    private PregnancyStatus pregnancyStatus = PregnancyStatus.UNKNOWN;
+    @Column(nullable = true)
+    private String inseminationType; // "Natural" or "AI"
 
-    private Date birthDate;
-    private Integer offspringCount = 0;
+    @Column(nullable = true)
+    private Boolean successStatus;  // If mating was successful
 
-    @CreationTimestamp
-    private Timestamp createdAt;
+    @Column(nullable = true)
+    private LocalDate pregnancyConfirmedDate;  // Date when pregnancy is confirmed
 
-    @UpdateTimestamp
-    private Timestamp updatedAt;
+    @Column(nullable = true)
+    private LocalDate dueDate;  // Automatically calculated when pregnancy is confirmed
+
+    @OneToMany(mappedBy = "breedingRecord")
+    private List<CalvingRecord> calvingRecords;  // Linked Calving Record
 
     // Getters and Setters
+    
     public BreedingRecord() {
 		// TODO Auto-generated constructor stub
 	}
     
+    
 
-    public BreedingRecord(Long breedingId, Animal femaleAnimal, Animal maleAnimal, Date matingDate,
-			Date pregnancyCheckDate, PregnancyStatus pregnancyStatus, Date birthDate, Integer offspringCount,
-			Timestamp createdAt, Timestamp updatedAt) {
+    public BreedingRecord(Long id, Animal animal, LocalDate matingDate, Animal sire, String inseminationType,
+			Boolean successStatus, LocalDate pregnancyConfirmedDate, LocalDate dueDate,
+			List<CalvingRecord> calvingRecords) {
 		super();
-		this.breedingId = breedingId;
-		this.femaleAnimal = femaleAnimal;
-		this.maleAnimal = maleAnimal;
+		this.id = id;
+		this.animal = animal;
 		this.matingDate = matingDate;
-		this.pregnancyCheckDate = pregnancyCheckDate;
-		this.pregnancyStatus = pregnancyStatus;
-		this.birthDate = birthDate;
-		this.offspringCount = offspringCount;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
+		this.sire = sire;
+		this.inseminationType = inseminationType;
+		this.successStatus = successStatus;
+		this.pregnancyConfirmedDate = pregnancyConfirmedDate;
+		this.dueDate = dueDate;
+		this.calvingRecords = calvingRecords;
 	}
 
 
-	public Long getBreedingId() {
-		return breedingId;
+
+	public Long getId() {
+		return id;
 	}
 
 
-	public void setBreedingId(Long breedingId) {
-		this.breedingId = breedingId;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 
-	public Animal getFemaleAnimal() {
-		return femaleAnimal;
+
+	public Animal getAnimal() {
+		return animal;
 	}
 
 
-	public void setFemaleAnimal(Animal femaleAnimal) {
-		this.femaleAnimal = femaleAnimal;
+
+	public void setAnimal(Animal animal) {
+		this.animal = animal;
 	}
 
 
-	public Animal getMaleAnimal() {
-		return maleAnimal;
-	}
 
-
-	public void setMaleAnimal(Animal maleAnimal) {
-		this.maleAnimal = maleAnimal;
-	}
-
-
-	public Date getMatingDate() {
+	public LocalDate getMatingDate() {
 		return matingDate;
 	}
 
 
-	public void setMatingDate(Date matingDate) {
+
+	public void setMatingDate(LocalDate matingDate) {
 		this.matingDate = matingDate;
 	}
 
 
-	public Date getPregnancyCheckDate() {
-		return pregnancyCheckDate;
+
+	public Animal getSire() {
+		return sire;
 	}
 
 
-	public void setPregnancyCheckDate(Date pregnancyCheckDate) {
-		this.pregnancyCheckDate = pregnancyCheckDate;
+
+	public void setSire(Animal sire) {
+		this.sire = sire;
 	}
 
 
-	public PregnancyStatus getPregnancyStatus() {
-		return pregnancyStatus;
+
+	public String getInseminationType() {
+		return inseminationType;
 	}
 
 
-	public void setPregnancyStatus(PregnancyStatus pregnancyStatus) {
-		this.pregnancyStatus = pregnancyStatus;
+
+	public void setInseminationType(String inseminationType) {
+		this.inseminationType = inseminationType;
 	}
 
 
-	public Date getBirthDate() {
-		return birthDate;
+
+	public Boolean getSuccessStatus() {
+		return successStatus;
 	}
 
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+
+	public void setSuccessStatus(Boolean successStatus) {
+		this.successStatus = successStatus;
 	}
 
 
-	public Integer getOffspringCount() {
-		return offspringCount;
+
+	public LocalDate getPregnancyConfirmedDate() {
+		return pregnancyConfirmedDate;
 	}
 
 
-	public void setOffspringCount(Integer offspringCount) {
-		this.offspringCount = offspringCount;
+
+	public void setPregnancyConfirmedDate(LocalDate pregnancyConfirmedDate) {
+		this.pregnancyConfirmedDate = pregnancyConfirmedDate;
 	}
 
 
-	public Timestamp getCreatedAt() {
-		return createdAt;
+
+	public LocalDate getDueDate() {
+		return dueDate;
 	}
 
 
-	public void setCreatedAt(Timestamp createdAt) {
-		this.createdAt = createdAt;
+
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
 	}
 
 
-	public Timestamp getUpdatedAt() {
-		return updatedAt;
+
+	public List<CalvingRecord> getCalvingRecords() {
+		return calvingRecords;
 	}
 
 
-	public void setUpdatedAt(Timestamp updatedAt) {
-		this.updatedAt = updatedAt;
+
+	public void setCalvingRecords(List<CalvingRecord> calvingRecords) {
+		this.calvingRecords = calvingRecords;
 	}
 
 
-	public enum PregnancyStatus {
-        PREGNANT, NOT_PREGNANT, UNKNOWN
+
+	// Automatically calculate due date (for pregnancy tracking)
+    public void calculateDueDate() {
+        if (this.pregnancyConfirmedDate != null) {
+            this.dueDate = this.pregnancyConfirmedDate.plusDays(280);  // Gestation period ~280 days
+        }
     }
 }
