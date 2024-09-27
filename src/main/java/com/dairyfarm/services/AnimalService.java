@@ -40,7 +40,8 @@ public class AnimalService {
     }
 
     public Animal createAnimal(Animal animal, MultipartFile imageFile, Long userId)throws IOException {
-    	User user = userRepository.findById(userId).get();
+    	System.out.println(userId);
+    	User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Fount at id ="+userId));
     	
     	if (imageFile != null && !imageFile.isEmpty()) {
             // Upload image to Cloudinary
