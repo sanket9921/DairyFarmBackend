@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dairyfarm.dto.AnimalDTO;
 import com.dairyfarm.exception.ResourceNotFoundException;
 import com.dairyfarm.models.Animal;
 import com.dairyfarm.models.User;
@@ -54,6 +56,13 @@ public class AnimalService {
             animal.setUser(user);
         }
         return animalRepository.save(animal);
+    }
+    
+    
+    public List<AnimalDTO> getUserAnimalList(Long userId){
+    	 return animalRepository.findByUserId(userId).stream()
+                 .map(animal -> new AnimalDTO(animal.getId(), animal.getTagNumber()))
+                 .collect(Collectors.toList());
     }
     
     public List<Animal> getAnimalsByUserId(Long userId) {

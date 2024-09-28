@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dairyfarm.dto.AnimalDTO;
 import com.dairyfarm.models.Animal;
 import com.dairyfarm.services.AnimalService;
 
@@ -50,7 +51,10 @@ public class AnimalController {
         return animalService.createAnimal(animal, imageFile, userId);
     }
 
-
+    @GetMapping("/list")
+    public List<AnimalDTO> getAnimalList(@RequestParam("userId") Long userId) {
+       return animalService.getUserAnimalList(userId);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Animal> updateAnimal(
