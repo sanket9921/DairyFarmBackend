@@ -45,7 +45,7 @@ public class BreedingRecord {
     @OneToMany(mappedBy = "breedingRecord")
     private List<CalvingRecord> calvingRecords;  // Linked Calving Record
 
-    // Getters and Setters
+    
     
     public BreedingRecord() {
 		// TODO Auto-generated constructor stub

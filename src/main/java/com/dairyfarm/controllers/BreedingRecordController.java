@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import com.dairyfarm.models.BreedingRecord;
 import com.dairyfarm.models.CalvingRecord;
 import com.dairyfarm.services.BreedingRecordService;
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/breeding")
 public class BreedingRecordController {
 
@@ -28,12 +31,17 @@ public class BreedingRecordController {
     @PostMapping("/create")
     public ResponseEntity<BreedingRecord> createBreedingRecord(
             @RequestParam Long animalId,
-            @RequestParam LocalDate matingDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate matingDate,  // Correct date format
             @RequestParam(required = false) Long sireId,  // Optional for AI
-            @RequestParam String inseminationType) {
+            @RequestParam String inseminationType
+            
+    		)
+    {
         BreedingRecord record = breedingRecordService.createBreedingRecord(animalId, matingDate, sireId, inseminationType);
         return ResponseEntity.ok(record);
+    	
     }
+
 
     // Confirm pregnancy
     @PostMapping("/confirm-pregnancy/{breedingRecordId}")
@@ -64,7 +72,7 @@ public class BreedingRecordController {
     @PostMapping("/register-calving/{breedingRecordId}")
     public ResponseEntity<CalvingRecord> registerCalving(
             @PathVariable Long breedingRecordId,
-            @RequestParam LocalDate calvingDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate calvingDate,
             @RequestParam Long calfId,
             @RequestParam String calfGender,
             @RequestParam String healthStatus,
